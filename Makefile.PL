@@ -13,7 +13,7 @@ version_from  'PCR.pm';
 
 # PCR.pm
 requires 'XSLoader';
-requires 're::engine::Plugin'   => '0.02';
+requires 're::engine::Plugin'   => '0.04_01';
 requires 'Pugs::Compiler::Rule' => '0.22';
 
 # t/

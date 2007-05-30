@@ -1,3 +1,4 @@
+ChangeLog
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
@@ -15,7 +16,9 @@ META.yml
 PCR.pm
 t/00-compile.t
 t/flags.t
+t/named.t
 t/qr.t
 t/qr_str.t
+t/return.t
 t/synopsis.t
 t/usage.t

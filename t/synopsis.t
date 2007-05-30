@@ -4,11 +4,7 @@ Test the example given in the L<SYNOPSIS|re::engine::PCR/SYNOPSIS>.
 
 =cut
 
-use strict;
-use feature ':5.10';
-
 use Test::More tests => 7;
-
 use re::engine::PCR;
 
 if ("abc" =~ /((.).)./) {

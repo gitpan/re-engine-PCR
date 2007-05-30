@@ -5,11 +5,10 @@ use base 'Regexp';
 
 use re::engine::Plugin ();
 
-use Pugs::Compiler::Token;
+use Pugs::Grammar::Base;
 use Pugs::Compiler::Regex;
-use Pugs::Compiler::Rule;
 
-our $VERSION = '0.01_01';
+our $VERSION = '0.02_01';
 
 sub import
 {
@@ -40,13 +39,12 @@ sub comp
     $option{ratchet}  = 1 if exists $mod{i};
 
     # Compile a PCR with the pattern & our flags
-    my $rule = Pugs::Compiler::Rule->compile( $pattern => \%option );
+    my $rule = Pugs::Compiler::Regex->compile( $pattern => \%option );
 
     # Put the rule object in the stash to use in ->exec
     $re->stash( $rule );
 
     # Return value discarded
-    undef;
 }
 
 sub exec
@@ -62,7 +60,12 @@ sub exec
     # No match, return false
     return unless $match;
 
-    # Named captures, $1->[0] eqv $match->[0][0]
+    my $croak_ro = sub {
+        require Carp;
+        Carp::croak("Modification of a read-only value attempted");
+    };
+
+    # Numbered captures, $1->[0] eqv $match->[0][0]
     $re->num_captures(
         FETCH => sub {
             my ($re, $n) = @_;
@@ -75,7 +78,39 @@ sub exec
 
             # $1, $2, ...
             return $match->[$n - 1];
-        }
+        },
+        STORE => $croak_ro,
+    );
+
+#    Getting this to work would be neato
+#    $re->num_captures(
+#        LENGTH => sub {
+#            my ($re, $n) = @_;
+#
+#            length $re->num_captures('FETCH')->($re, $n);
+#        },
+#    );
+
+    # Named captures, $+{key} | $-{key} eqv $match->{key}
+    $re->named_captures(
+        FETCH => sub {
+            my ($re, $key) = @_;
+
+            # $+{$key} & $-{$key}
+            return $match->{$key};
+        },
+        EXISTS => sub {
+            my ($re, $key) = @_;
+
+            exists $match->{$key};
+        },
+        STORE    => $croak_ro,
+        DELETE   => $croak_ro,
+        CLEAR    => $croak_ro,
+        # Ugh, how do I do this?
+        FIRSTKEY => sub { 'FIXME'  },
+        NEXTKEY  => sub { undef  },
+        SCALAR   => sub { scalar %$match },
     );
 
     # Matched
@@ -90,7 +125,7 @@ re::engine::PCR - L<Pugs::Compiler::Rule> regex engine
 
 =head1 SYNOPSIS
 
-    use 5.10;
+    use feature 'say';
     use re::engine::PCR;
 
     if ("abc" =~ q/((.).)./) {
@@ -106,7 +141,7 @@ re::engine::PCR - L<Pugs::Compiler::Rule> regex engine
 =head1 DESCRIPTION
 
 Replaces the perl regular expression engine in a given lexical scope
-with the engine provided by L<Pugs::Compiler::Rule>.
+with the engine provided by L<Pugs::Compiler::Regex>.
 
 =head1 CAVEATS
 

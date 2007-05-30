@@ -1,0 +1,12 @@
+2007-05-29 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.02_01)
+
+	* Developer release with support for named captures, requires 
+	* PCR.pm: Use Pugs::Compiler::Regex not Pugs::Compiler::Rule
+	* t/named.t: Test for named captures
+	* t/return.t: Test for { return }
+	* t/synopsis.t: Cut out redundant code
+	* Makefile.PL: require ::Plugin v0.04_01
+
+2007-05-17 Ævar Arnfjörð Bjarmason <avar@cpan.org> (0.01_01)
+	
+	* Initial developer release
